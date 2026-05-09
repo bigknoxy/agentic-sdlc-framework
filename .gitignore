@@ -1,0 +1,63 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.Python
+env/
+venv/
+ENV/
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Documentation build
+docs/_build/
+site/
+
+# Secrets (should never be committed)
+*.pem
+*.key
+*.crt
+secrets/
+config/secrets.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Misc
+.cache/
+.parcel-cache/
