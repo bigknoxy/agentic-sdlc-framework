@@ -1,0 +1,516 @@
+---
+spec_id: SPEC-YYYY-MM-DD-001
+title: [Feature/Workflow Name]
+status: draft
+priority: p1
+estimated_effort: [hours or story points]
+template_version: 1.0.0
+---
+
+# Agent-Ready Specification
+
+> **Purpose:** This document serves as the single source of truth for implementing a feature. It is designed to be "agent-ready" — meaning an AI agent should be able to read this spec and produce correct, complete implementation without additional clarification.
+
+## 1. Context (Business Problem)
+
+### Current State
+[Describe what exists today. What is the pain point? What manual work is being done? What is broken or missing?]
+
+**Example:**
+> Currently, generating the monthly compliance report requires manually running 3 SQL queries, copying results into Excel, formatting, and emailing. This takes 4 hours each month and has resulted in errors twice in the past year.
+
+### Desired State
+[Describe what the world looks like after this is implemented. Be specific about outcomes, not just outputs.]
+
+**Example:**
+> The compliance report generates automatically on the first of each month, validates data quality, and emails stakeholders. Manual effort reduced to 15 minutes of review.
+
+### Business Value
+
+**Primary KPI Impact:**
+- Metric: [e.g., "Time to generate report", "Error rate", "Customer satisfaction"]
+- Current: [baseline]
+- Target: [goal]
+- Measurement Method: [how you'll measure]
+
+**Secondary Benefits:**
+- [Benefit 1 with quantification if possible]
+- [Benefit 2]
+
+**Risk if Not Done:**
+[What happens if we don't implement this? Be honest about consequences.]
+
+---
+
+## 2. Goal State (Definition of Done)
+
+### Functional Requirements
+
+**Must Have (P0):**
+- [ ] Requirement 1: [Specific, testable requirement]
+- [ ] Requirement 2: [Specific, testable requirement]
+- [ ] Requirement 3: [Specific, testable requirement]
+
+**Should Have (P1):**
+- [ ] Requirement 4: [Lower priority requirement]
+- [ ] Requirement 5: [Lower priority requirement]
+
+**Nice to Have (P2):**
+- [ ] Requirement 6: [Stretch goal]
+
+### Non-Functional Requirements
+
+**Performance:**
+- Response time: [e.g., "< 200ms for 95th percentile"]
+- Throughput: [e.g., "100 requests/second"]
+- Resource usage: [e.g., "< 512MB RAM"]
+
+**Security:**
+- Authentication: [e.g., "OAuth 2.0 with MFA"]
+- Authorization: [e.g., "RBAC with 3 roles"]
+- Data protection: [e.g., "Encryption at rest and in transit"]
+
+**Compliance:**
+- Audit logging: [what must be logged]
+- Data retention: [policy]
+- Regulatory requirements: [specific regulations]
+
+**Reliability:**
+- Uptime SLA: [e.g., "99.9%"]
+- Recovery time: [e.g., "< 1 hour"]
+- Error handling: [graceful degradation requirements]
+
+---
+
+## 3. Non-Negotiable Constraints
+
+### Technical Constraints
+
+**Language & Framework:**
+- Primary language: [e.g., "Python 3.11+"]
+- Framework: [e.g., "FastAPI"]
+- UI framework (if applicable): [e.g., "React 18+"]
+
+**Architecture Patterns:**
+- [Pattern 1: e.g., "Hexagonal architecture"]
+- [Pattern 2: e.g., "Repository pattern for data access"]
+- [Pattern 3: e.g., "Circuit breaker for external calls"]
+
+**Dependencies:**
+**Approved (can use):**
+- [Library 1] - [version constraint]
+- [Library 2] - [version constraint]
+
+**Forbidden (cannot use):**
+- [Library 3] - [reason]
+- [Library 4] - [reason]
+
+**Infrastructure:**
+- Deployment target: [e.g., "AWS ECS", "Kubernetes", "Vercel"]
+- Database: [e.g., "PostgreSQL 15"]
+- Cache: [e.g., "Redis"]
+- Message queue (if needed): [e.g., "RabbitMQ"]
+
+### Security Constraints
+
+**Data Classification:**
+- [ ] Restricted (SSN, TIN, account numbers) — **CANNOT USE**
+- [ ] Confidential (member data, financials) — **REQUIRES APPROVAL**
+- [x] Internal (business data) — **APPROVED**
+- [ ] Public — **APPROVED**
+
+**Authentication & Authorization:**
+- Auth method: [e.g., "OIDC with corporate IdP"]
+- Session management: [e.g., "JWT with 1-hour expiry"]
+- Required roles: [e.g., "admin", "user", "viewer"]
+- MFA required: [Yes/No]
+
+**Data Handling:**
+- Encryption at rest: [Required algorithm]
+- Encryption in transit: [TLS 1.3 minimum]
+- PII handling: [Masking/redaction rules]
+- Data residency: [e.g., "US-only"]
+
+### Compliance Constraints
+
+**Audit Requirements:**
+- [ ] All data access logged
+- [ ] All configuration changes logged
+- [ ] All authentication events logged
+- [ ] [Specific to this feature]
+
+**Approval Gates:**
+- [ ] Business stakeholder approval required
+- [ ] Technical lead review required
+- [ ] Security review required
+- [ ] Compliance review required
+
+**Documentation Required:**
+- [ ] Architecture Decision Record (ADR)
+- [ ] Runbook
+- [ ] API documentation
+- [ ] User guide
+
+---
+
+## 4. Acceptance Criteria (Executable Tests)
+
+> **Guidance:** Write tests in Gherkin format (Given/When/Then) so they can be automated. Each test should be independent and deterministic.
+
+### Test 1: [Happy Path Scenario]
+
+**Scenario:** [Descriptive name]
+
+```gherkin
+Given [precondition 1]
+  And [precondition 2]
+When [action]
+Then [expected result 1]
+  And [expected result 2]
+```
+
+**Automation:** [unit/integration/e2e]
+**Priority:** [P0/P1/P2]
+**Related Requirement:** [Link to requirement in Section 2]
+
+### Test 2: [Edge Case/Error Scenario]
+
+**Scenario:** [Descriptive name]
+
+```gherkin
+Given [precondition]
+When [action that triggers error]
+Then [expected error response]
+  And [expected logging]
+```
+
+**Automation:** [unit/integration/e2e]
+**Priority:** [P0/P1/P2]
+
+### Test 3: [Security/Compliance Scenario]
+
+**Scenario:** [Descriptive name]
+
+```gherkin
+Given [unauthorized user]
+When [attempt to access resource]
+Then [access denied]
+  And [audit log entry created]
+```
+
+**Automation:** [integration/e2e]
+**Priority:** [P0]
+
+### Test Matrix
+
+| Test ID | Scenario | Type | Priority | Status |
+|---------|----------|------|----------|--------|
+| T001 | [Name] | unit | P0 | pending |
+| T002 | [Name] | integration | P0 | pending |
+| T003 | [Name] | e2e | P1 | pending |
+
+---
+
+## 5. Edge Cases & Error Handling
+
+### Edge Cases
+
+| Scenario | Expected Behavior | Test Coverage |
+|----------|------------------|---------------|
+| [Edge case 1: e.g., "Empty input"] | [Behavior] | [Test ID] |
+| [Edge case 2: e.g., "Maximum load"] | [Behavior] | [Test ID] |
+| [Edge case 3: e.g., "Concurrent access"] | [Behavior] | [Test ID] |
+| [Edge case 4: e.g., "Network timeout"] | [Behavior] | [Test ID] |
+
+### Error Handling
+
+| Error Condition | HTTP Status | Error Code | User Message | Log Level |
+|----------------|-------------|------------|--------------|-----------|
+| [Error 1] | 400 | BAD_REQUEST | "..." | INFO |
+| [Error 2] | 401 | UNAUTHORIZED | "..." | WARN |
+| [Error 3] | 500 | INTERNAL_ERROR | "..." | ERROR |
+
+### Recovery Procedures
+
+**Automatic Recovery:**
+- [Procedure 1: e.g., "Retry with exponential backoff"]
+- [Procedure 2: e.g., "Failover to secondary"]
+
+**Manual Intervention Required:**
+- [Scenario 1: when to escalate]
+- [Scenario 2: when to page on-call]
+
+---
+
+## 6. Rollback Conditions
+
+### Automatic Rollback Triggers
+
+| Metric | Threshold | Measurement Window | Action |
+|--------|-----------|-------------------|--------|
+| Error rate | > 5% | 5 minutes | Automatic rollback |
+| Response time | > 2s (p95) | 10 minutes | Automatic rollback |
+| Failed health checks | 3 consecutive | 1 minute | Automatic rollback |
+| Security alert | Any critical | Immediate | Automatic rollback + page |
+
+### Manual Rollback Procedure
+
+**Before Rollback:**
+1. [ ] Confirm issue is deployment-related
+2. [ ] Notify team in [#channel]
+3. [ ] Document incident number
+
+**Rollback Steps:**
+1. [Step 1: e.g., "Run rollback script: ./scripts/rollback.sh"]
+2. [Step 2: e.g., "Verify previous version healthy"]
+3. [Step 3: e.g., "Update load balancer"]
+4. [Step 4: e.g., "Notify stakeholders"]
+
+**Post-Rollback:**
+1. [ ] Verify functionality
+2. [ ] Document root cause
+3. [ ] Schedule post-mortem
+
+---
+
+## 7. Data Classification & Handling
+
+### Data Types Involved
+
+| Data Type | Classification | Source | Destination | Handling |
+|-----------|---------------|--------|-------------|----------|
+| [e.g., "User email"] | [level] | [source] | [destination] | [encryption/masking] |
+| [e.g., "Report data"] | [level] | [source] | [destination] | [handling] |
+
+### Data Flow Diagram
+
+```
+[Source System] → [Processing] → [Destination]
+     ↓                ↓              ↓
+[Encryption]    [Validation]   [Audit Log]
+```
+
+### Retention & Deletion
+
+**Retention Policy:**
+- Data type: [retention period]
+- Archive after: [timeframe]
+- Delete after: [timeframe]
+
+**Deletion Procedure:**
+1. [Step 1]
+2. [Step 2]
+
+---
+
+## 8. Audit Trail Requirements
+
+### Events to Log
+
+| Event | Data to Capture | Log Level | Retention |
+|-------|----------------|-----------|-----------|
+| [e.g., "Report generated"] | [user, timestamp, parameters] | INFO | 90 days |
+| [e.g., "Access denied"] | [user, resource, reason] | WARN | 1 year |
+| [e.g., "Config changed"] | [user, old, new, reason] | INFO | 7 years |
+
+### Log Format
+
+```json
+{
+  "timestamp": "2025-01-15T10:30:00Z",
+  "level": "INFO",
+  "service": "reporting-service",
+  "correlation_id": "uuid-v4",
+  "actor": {
+    "type": "user|system|agent",
+    "id": "identifier"
+  },
+  "action": "report.generated",
+  "resource": {
+    "type": "report",
+    "id": "monthly-compliance-2025-01"
+  },
+  "context": {
+    "ip_address": "10.0.0.1",
+    "session_id": "sess_xxx"
+  },
+  "result": "success",
+  "duration_ms": 1500,
+  "metadata": {
+    "custom_field": "value"
+  }
+}
+```
+
+### Audit Review
+
+**Frequency:** [e.g., "Quarterly"]
+**Reviewer:** [e.g., "Compliance team"]
+**Access:** [e.g., "Read-only to compliance-audit role"]
+
+---
+
+## 9. Implementation Notes
+
+### Suggested Approach
+
+**High-level strategy:**
+[Describe the recommended approach. This is guidance, not prescription.]
+
+**Key design decisions:**
+1. [Decision 1 with rationale]
+2. [Decision 2 with rationale]
+
+### File Structure
+
+```
+src/
+├── __init__.py
+├── main.py              # Application entry point
+├── config.py            # Configuration management
+├── api/
+│   ├── __init__.py
+│   ├── routes.py        # API routes
+│   └── middleware.py    # Auth, logging, etc.
+├── services/
+│   ├── __init__.py
+│   └── [feature].py     # Business logic
+├── models/
+│   ├── __init__.py
+│   └── [feature].py     # Data models
+└── utils/
+    ├── __init__.py
+    └── [helpers].py     # Utilities
+
+tests/
+├── unit/
+│   └── test_[feature].py
+├── integration/
+│   └── test_[feature].py
+└── e2e/
+    └── test_[feature].py
+
+docs/
+├── adr/
+│   └── adr-001-[decision].md
+└── runbooks/
+    └── [feature]-runbook.md
+```
+
+### Dependencies to Add
+
+| Dependency | Version | Purpose | License |
+|------------|---------|---------|---------|
+| [lib1] | ^1.0.0 | [purpose] | [license] |
+| [lib2] | ^2.0.0 | [purpose] | [license] |
+
+### API Design (if applicable)
+
+**Endpoint:** `POST /api/v1/resource`
+
+**Request:**
+```json
+{
+  "field1": "type",
+  "field2": "type"
+}
+```
+
+**Response (200):**
+```json
+{
+  "id": "uuid",
+  "status": "created",
+  "created_at": "ISO8601"
+}
+```
+
+**Response (400):**
+```json
+{
+  "error": "VALIDATION_ERROR",
+  "message": "...",
+  "details": [...]
+}
+```
+
+---
+
+## 10. Approval Checklist
+
+### Pre-Implementation Approvals
+
+- [ ] **Business Stakeholder**
+  - Name: _________________
+  - Date: _______
+  - Signature: _________________
+  - Notes: _________________
+
+- [ ] **Technical Lead**
+  - Name: _________________
+  - Date: _______
+  - Signature: _________________
+  - Notes: _________________
+
+- [ ] **Security Review** (if required)
+  - Name: _________________
+  - Date: _______
+  - Signature: _________________
+  - Notes: _________________
+
+- [ ] **Compliance Review** (if required)
+  - Name: _________________
+  - Date: _______
+  - Signature: _________________
+  - Notes: _________________
+
+### Spec Quality Checklist
+
+- [ ] All sections complete
+- [ ] Acceptance criteria are executable (Gherkin format)
+- [ ] Edge cases identified
+- [ ] Rollback procedure defined
+- [ ] Security constraints documented
+- [ ] Compliance requirements captured
+- [ ] Estimated effort realistic
+- [ ] Dependencies approved
+
+### Agent Readiness Checklist
+
+- [ ] File paths specified
+- [ ] Code patterns defined
+- [ ] Test expectations clear
+- [ ] Error handling specified
+- [ ] Constraints explicit
+
+---
+
+## Appendix A: Reference Materials
+
+### Related Documents
+
+- [Link to architecture diagram]
+- [Link to API specification]
+- [Link to security review]
+- [Link to compliance checklist]
+
+### Glossary
+
+| Term | Definition |
+|------|------------|
+| [Term] | [Definition] |
+
+### Change Log
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 0.1 | YYYY-MM-DD | [Name] | Initial draft |
+| 1.0 | YYYY-MM-DD | [Name] | Approved for implementation |
+
+---
+
+**Spec Status:** draft → approved → implemented → deployed → retired
+
+**Last Updated:** YYYY-MM-DD
+
+**Next Review Date:** YYYY-MM-DD
