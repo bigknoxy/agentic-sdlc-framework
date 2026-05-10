@@ -1,5 +1,10 @@
 # Agentic SDLC Framework
 
+[![CI](https://github.com/bigknoxy/agentic-sdlc-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/bigknoxy/agentic-sdlc-framework/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/agentic-sdlc.svg?style=flat-square)](https://www.npmjs.com/package/agentic-sdlc)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg?style=flat-square)](https://nodejs.org/)
+
 A production-ready framework for incorporating AI agents into the software development lifecycle, with built-in governance, security, auditing, and self-documentation.
 
 ## Overview
@@ -29,6 +34,18 @@ This framework adapts the **FRAME** methodology (Focus, Requirements, Automation
 5. **Continuous Evaluation** — Weekly metrics on golden task set
 
 ## Quick Start
+
+### Install CLI
+
+```bash
+# One-line install
+curl -fsSL https://raw.githubusercontent.com/bigknoxy/agentic-sdlc-framework/main/npm/scripts/install.sh | sh
+
+# Or via npm
+npm install -g agentic-sdlc
+```
+
+### Get Started
 
 1. Review the [Framework Documentation](docs/framework-overview.md)
 2. Use the [Agent-Ready Spec Template](templates/agent-ready-spec.md)
