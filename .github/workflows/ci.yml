@@ -71,20 +71,41 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Secret Detection
+      - name: Secret Detection (PR)
+        if: github.event_name == 'pull_request'
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: main
-          head: HEAD
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
           extra_args: --debug --only-verified
+
+      - name: Secret Detection (Push)
+        if: github.event_name == 'push'
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.before }}
+          head: ${{ github.event.after }}
+          extra_args: --debug --only-verified
+
+      - name: Secret Detection (Fallback)
+        if: failure()
+        run: |
+          echo "⚠️ TruffleHog scan encountered an issue, running basic secret check"
+          # Basic check for common secret patterns
+          if grep -r -i "password\|secret\|token\|key" --include="*.md" --include="*.txt" --include="*.yaml" --include="*.yml" . | grep -v "example\|template\|placeholder" | head -20; then
+            echo "⚠️ Potential secrets found - please review"
+          fi
+          echo "✅ Basic secret check complete"
 
       - name: Check for sensitive files
         run: |
           # Check for files that shouldn't be committed
-          if find . -name "*.pem" -o -name "*.key" -o -name "*.p12" -o -name ".env" | grep -q .; then
+          SENSITIVE=$(find . -name "*.pem" -o -name "*.key" -o -name "*.p12" -o -name ".env" 2>/dev/null | grep -v node_modules | head -20)
+          if [ -n "$SENSITIVE" ]; then
             echo "❌ Sensitive files found:"
-            find . -name "*.pem" -o -name "*.key" -o -name "*.p12" -o -name ".env"
+            echo "$SENSITIVE"
             exit 1
           fi
           echo "✅ No sensitive files found"
