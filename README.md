@@ -118,7 +118,13 @@ Then from Claude Desktop: "Create a spec for adding OAuth to the user service" â
 # Install from source (PyPI publish in progress â€” tracked: specs/SPEC-2026-05-15-001.md)
 git clone https://github.com/bigknoxy/agentic-sdlc-framework.git
 cd agentic-sdlc-framework
-pip install -e ".[dev]"   # Python 3.11+ required
+
+# Create virtual environment (recommended for Python 3.11+)
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install in development mode
+pip install -e ".[dev]"
 
 # Initialize a project
 agentic-sdlc init my-project
