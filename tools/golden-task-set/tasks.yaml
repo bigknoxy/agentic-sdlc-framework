@@ -1,0 +1,290 @@
+# Golden Task Set — Apex Lending Services API
+# Version: 1.0.0
+# Last reviewed: 2026-05-15
+# Quarterly review due: 2026-08-15
+#
+# Categories: bug_fix | api_extension | migration | integration
+# Complexity:  low (< 30 min) | medium (30–60 min) | high (60–90 min)
+# Baseline pass rates are null until first full evaluation run is complete.
+
+tasks:
+
+  # ──────────────────────────────────────────────
+  # CATEGORY: bug_fix
+  # ──────────────────────────────────────────────
+
+  - id: GT-001
+    category: bug_fix
+    title: "Fix advance rate calculation rounding error"
+    description: >
+      The GET /advances/{advance_id}/amortization endpoint returns monthly
+      payment amounts that are off by $0.01–$0.02 due to intermediate float
+      arithmetic. The root cause is that the agent must apply banker's rounding
+      (round-half-to-even) using Python's Decimal type rather than float, and
+      ensure the final installment absorbs any residual cent rather than
+      truncating. The fix must not change the API contract or break existing
+      unit tests for the happy path.
+    complexity: low
+    estimated_minutes: 20
+    acceptance_criteria:
+      - "Given a 10-year advance of $500,000 at 5.25% fixed rate, when the amortization schedule is requested, then the sum of all monthly payments equals the total principal plus total interest to within $0.00 (no accumulated rounding drift)"
+      - "Given the existing unit test suite, when the fix is applied, then all previously passing tests continue to pass"
+      - "Given the fix, when code review runs, then no float arithmetic remains in the payment calculation path"
+    tags: [banking, calculation, decimal, advances]
+    baseline_pass_rate: null
+
+  - id: GT-002
+    category: bug_fix
+    title: "Fix null pointer in member lookup when collateral record is missing"
+    description: >
+      The GET /members/{member_id} endpoint raises an unhandled AttributeError
+      when a member record exists but has no associated collateral entries in
+      the collateral table (a valid state for new members). The response should
+      return the member record with collateral_summary: null rather than
+      crashing with HTTP 500. The fix must add a null guard, return the correct
+      response shape, and add a regression test for the no-collateral case.
+    complexity: low
+    estimated_minutes: 15
+    acceptance_criteria:
+      - "Given a member with no collateral records, when GET /members/{member_id} is called, then the response is HTTP 200 with collateral_summary set to null"
+      - "Given a member with collateral records, when GET /members/{member_id} is called, then the response is unchanged from current behavior"
+      - "Given the fix, when the regression test is added, then the test covers the no-collateral branch explicitly"
+    tags: [banking, null-handling, members, collateral]
+    baseline_pass_rate: null
+
+  - id: GT-003
+    category: bug_fix
+    title: "Fix off-by-one in advance balance remaining calculation"
+    description: >
+      The advance_balance_remaining field returned by GET /members/{member_id}/advances
+      is calculated as (original_principal - total_payments_made). However,
+      the query double-counts the origination fee when total_payments_made is
+      aggregated, causing the remaining balance to appear $500–$2,000 lower than
+      the actual ledger balance for advances with non-zero origination fees.
+      The agent must identify the incorrect aggregation, fix the SQL/ORM query,
+      and verify the fix with a parameterized test covering origination_fee = 0
+      and origination_fee > 0 cases.
+    complexity: medium
+    estimated_minutes: 35
+    acceptance_criteria:
+      - "Given an advance with origination_fee = $1,500 and 12 payments made, when advance balance remaining is calculated, then the value matches the ledger balance exactly"
+      - "Given an advance with origination_fee = $0, when advance balance remaining is calculated, then the value is unchanged from current behavior"
+      - "Given the fix, when a parameterized test is run with 5 different origination fee values, then all assertions pass"
+    tags: [banking, sql, advances, balance, aggregation]
+    baseline_pass_rate: null
+
+  # ──────────────────────────────────────────────
+  # CATEGORY: api_extension
+  # ──────────────────────────────────────────────
+
+  - id: GT-004
+    category: api_extension
+    title: "Add GET /members/{member_id}/advances endpoint"
+    description: >
+      The Member Services API currently has no endpoint to list all advances
+      for a given member. Add GET /members/{member_id}/advances that returns
+      a paginated list of advances (open and closed) sorted by origination_date
+      descending. Required query parameters: status (open|closed|all, default
+      all), page (int, default 1), page_size (int, default 25, max 100).
+      Response must include total_count and next_page_url. Data classification
+      is confidential — log member_id hash, not raw member_id, in access logs.
+    complexity: medium
+    estimated_minutes: 45
+    acceptance_criteria:
+      - "Given a member with 3 open advances and 2 closed advances, when GET /members/{member_id}/advances?status=open is called, then the response contains exactly 3 advances with status=open"
+      - "Given 30 advances for a member, when GET /members/{member_id}/advances?page=2&page_size=10 is called, then the response contains advances 11–20 and next_page_url points to page 3"
+      - "Given an authenticated request, when the endpoint is called, then the access log entry contains member_id_hash (SHA-256 of member_id) and not the raw member_id"
+      - "Given a member_id that does not exist, when the endpoint is called, then the response is HTTP 404 with error code MEMBER_NOT_FOUND"
+    tags: [banking, api, advances, pagination, confidential]
+    baseline_pass_rate: null
+
+  - id: GT-005
+    category: api_extension
+    title: "Add pagination to GET /members endpoint"
+    description: >
+      The existing GET /members endpoint returns all members in a single
+      unbounded response, which is causing timeout issues as member count grows
+      past 1,200. Add cursor-based pagination using a last_seen_member_id
+      cursor parameter. The response envelope must include a next_cursor field
+      (null on the last page). Default page size is 50, max is 200.
+      The endpoint must remain backward-compatible — callers not passing a
+      cursor must receive the first page, not an error. Add OpenAPI schema
+      annotations for the new parameters and response fields.
+    complexity: medium
+    estimated_minutes: 40
+    acceptance_criteria:
+      - "Given 1,500 members and no cursor parameter, when GET /members is called, then the response contains 50 members and a non-null next_cursor"
+      - "Given the next_cursor from the first page, when GET /members?cursor={next_cursor} is called, then the response contains the next 50 members in the same sort order with no duplicates"
+      - "Given the last page, when the endpoint is called, then next_cursor is null"
+      - "Given page_size=300 (over max), when the endpoint is called, then the response is HTTP 400 with error code INVALID_PAGE_SIZE"
+    tags: [banking, api, pagination, members, backward-compatibility]
+    baseline_pass_rate: null
+
+  - id: GT-006
+    category: api_extension
+    title: "Add POST /members/{member_id}/collateral endpoint"
+    description: >
+      Members can pledge additional collateral to support new advance requests.
+      Add POST /members/{member_id}/collateral that accepts a collateral pledge
+      record (collateral_type, description, estimated_value, lien_position).
+      The endpoint must validate that collateral_type is one of the approved
+      enum values (REAL_ESTATE, SECURITIES, AGENCY_MBS, WHOLE_LOANS), that
+      estimated_value > 0, and that lien_position is 1 or 2. On success, return
+      HTTP 201 with the created collateral record including a system-assigned
+      collateral_id. Audit log required: actor, action=collateral.pledged,
+      member_id_hash, collateral_id, estimated_value.
+    complexity: high
+    estimated_minutes: 60
+    acceptance_criteria:
+      - "Given a valid collateral pledge body, when POST /members/{member_id}/collateral is called, then the response is HTTP 201 with a collateral_id assigned by the system"
+      - "Given collateral_type=UNSECURED (invalid), when the endpoint is called, then the response is HTTP 422 with field-level validation error identifying collateral_type"
+      - "Given estimated_value=-1000 (invalid), when the endpoint is called, then the response is HTTP 422 with field-level validation error identifying estimated_value"
+      - "Given a successful pledge, when the audit log is inspected, then an entry exists with actor, action=collateral.pledged, member_id_hash, and estimated_value"
+    tags: [banking, api, collateral, audit, confidential]
+    baseline_pass_rate: null
+
+  # ──────────────────────────────────────────────
+  # CATEGORY: migration
+  # ──────────────────────────────────────────────
+
+  - id: GT-007
+    category: migration
+    title: "Add audit_timestamp column to advances table"
+    description: >
+      Add a non-nullable audit_timestamp column (TIMESTAMPTZ) to the advances
+      table to support SOX audit requirements. Existing rows must be backfilled
+      with the value of created_at. The migration must be reversible (down
+      migration drops the column). The ORM model and any serializers that
+      return advance records must be updated to include audit_timestamp. No
+      existing API response shapes should break — audit_timestamp is additive.
+    complexity: low
+    estimated_minutes: 25
+    acceptance_criteria:
+      - "Given the migration is applied, when the advances table is inspected, then an audit_timestamp column of type TIMESTAMPTZ with NOT NULL constraint exists"
+      - "Given existing advance rows before migration, when migration is applied, then all rows have audit_timestamp equal to their created_at value"
+      - "Given the migration is reversed (down), when the advances table is inspected, then the audit_timestamp column no longer exists"
+      - "Given the ORM model is updated, when GET /advances/{id} is called after migration, then the response includes audit_timestamp in ISO 8601 format"
+    tags: [banking, migration, schema, audit, sox]
+    baseline_pass_rate: null
+
+  - id: GT-008
+    category: migration
+    title: "Migrate member_id format from integer to UUID"
+    description: >
+      The current member_id is an auto-incrementing integer. For security and
+      interoperability reasons, migrate to UUID v4. This requires: (1) add a
+      new member_uuid column, (2) backfill all existing rows with deterministic
+      UUID v5 values derived from the legacy integer ID so the mapping is
+      reproducible, (3) update all foreign key references in advances and
+      collateral tables, (4) add an index on member_uuid. The legacy integer
+      member_id column must be retained (not dropped) in this migration to allow
+      a parallel-run period. API endpoints should accept either format during
+      the transition window.
+    complexity: high
+    estimated_minutes: 75
+    acceptance_criteria:
+      - "Given the migration is applied, when the members table is inspected, then a member_uuid column of type UUID with UNIQUE and NOT NULL constraints exists"
+      - "Given member with integer id=42, when migration is applied, then member_uuid is the deterministic UUID v5 value derived from id=42 (reproducible across environments)"
+      - "Given the migration is applied, when GET /members/{member_uuid} is called with the UUID, then the correct member record is returned"
+      - "Given the migration is applied, when GET /members/{legacy_integer_id} is called, then the correct member record is still returned (backward-compatible transition period)"
+    tags: [banking, migration, uuid, members, backward-compatibility]
+    baseline_pass_rate: null
+
+  - id: GT-009
+    category: migration
+    title: "Add data_classification column to collateral table"
+    description: >
+      For FHFA audit purposes, each collateral record must carry its data
+      classification label. Add a data_classification column (VARCHAR(20),
+      NOT NULL) to the collateral table with a check constraint limiting values
+      to ('restricted', 'confidential', 'internal', 'public'). Backfill all
+      existing rows with 'confidential' (the correct classification for member
+      collateral). Update the ORM model, API serializer, and OpenAPI schema to
+      include the field. Write a migration test that verifies the check
+      constraint rejects an invalid value.
+    complexity: low
+    estimated_minutes: 20
+    acceptance_criteria:
+      - "Given the migration is applied, when an INSERT with data_classification='restricted' is attempted, then it succeeds (valid value)"
+      - "Given the migration is applied, when an INSERT with data_classification='top_secret' is attempted, then the database rejects it with a check constraint violation"
+      - "Given existing collateral rows, when migration is applied, then all rows have data_classification='confidential'"
+      - "Given the ORM model is updated, when GET /members/{id}/collateral is called, then each collateral record includes data_classification"
+    tags: [banking, migration, collateral, data-classification, fhfa]
+    baseline_pass_rate: null
+
+  # ──────────────────────────────────────────────
+  # CATEGORY: integration
+  # ──────────────────────────────────────────────
+
+  - id: GT-010
+    category: integration
+    title: "Add SFTP file processing for daily collateral valuation feed"
+    description: >
+      The organization receives a daily CSV file from a third-party collateral valuation
+      vendor via SFTP. Add a batch job (runnable as a CLI command and as a
+      scheduled task) that: (1) connects to the configured SFTP server using
+      key-based auth (private key path from env var), (2) downloads the latest
+      collateral_valuations_YYYYMMDD.csv file, (3) validates the CSV schema
+      (required columns: collateral_id, valuation_date, estimated_value,
+      valuation_method), (4) upserts records into the collateral_valuations
+      table, (5) archives the processed file to a local directory,
+      (6) writes a structured audit log entry for the batch run including
+      record count and any validation errors.
+    complexity: high
+    estimated_minutes: 70
+    acceptance_criteria:
+      - "Given a valid CSV file on the SFTP server, when the batch job runs, then all records are upserted into collateral_valuations and the file is archived"
+      - "Given a CSV file with a missing required column, when the batch job runs, then no records are written, an error is logged with the specific missing column, and the job exits with code 1"
+      - "Given an SFTP connection failure, when the batch job runs, then the error is logged with the exception detail and the job exits with code 1 (no partial writes)"
+      - "Given a successful run, when the audit log is inspected, then an entry exists with batch_job=collateral_valuation_import, record_count, status=success, and timestamp"
+    tags: [banking, sftp, integration, collateral, batch, audit]
+    baseline_pass_rate: null
+
+  - id: GT-011
+    category: integration
+    title: "Add webhook handler for Federal Reserve rate change notifications"
+    description: >
+      Add POST /webhooks/fed-rate-change endpoint that receives rate change
+      notifications from the internal Treasury system. The payload includes
+      rate_type (OVERNIGHT|SOFR|PRIME), effective_date, and new_rate_bps
+      (integer basis points). The handler must: (1) validate the HMAC-SHA256
+      signature in the X-Treasury-Signature header, (2) store the rate change
+      event in the rate_events table, (3) trigger an async recalculation of
+      affected variable-rate advances (enqueue to internal job queue),
+      (4) return HTTP 200 with a JSON receipt. Invalid signatures must return
+      HTTP 401. Duplicate events (same rate_type + effective_date) must be
+      idempotent — HTTP 200 with a receipt indicating already_processed: true.
+    complexity: high
+    estimated_minutes: 65
+    acceptance_criteria:
+      - "Given a valid payload with correct HMAC-SHA256 signature, when POST /webhooks/fed-rate-change is called, then the response is HTTP 200 and the rate event is stored"
+      - "Given a payload with an invalid signature, when the endpoint is called, then the response is HTTP 401 with error code INVALID_SIGNATURE and no record is written"
+      - "Given the same rate_type + effective_date is submitted twice, when the second request arrives, then the response is HTTP 200 with already_processed=true and no duplicate record is created"
+      - "Given a valid payload, when the handler completes, then a job is enqueued for variable-rate advance recalculation with the new rate_bps"
+    tags: [banking, webhook, integration, hmac, idempotent, fed-rate]
+    baseline_pass_rate: null
+
+  - id: GT-012
+    category: integration
+    title: "Add structured error response for downstream Core Banking System failures"
+    description: >
+      When the Member Services API calls the Core Banking System (CBS) to
+      validate advance eligibility, the CBS occasionally returns HTTP 503 or
+      times out. Currently, these errors propagate as raw HTTP 500 to API
+      callers. Add a circuit-breaker wrapper around the CBS client that:
+      (1) retries on 503/timeout up to 3 times with exponential backoff
+      (1s, 2s, 4s), (2) opens the circuit after 5 consecutive failures and
+      returns HTTP 503 with error code CBS_UNAVAILABLE and retry_after_seconds
+      to the caller, (3) logs each retry attempt and circuit state change,
+      (4) closes the circuit after a 60-second cooldown on the next successful
+      probe. The implementation must not change any existing API response for
+      successful CBS calls.
+    complexity: medium
+    estimated_minutes: 50
+    acceptance_criteria:
+      - "Given the CBS returns HTTP 503, when the API is called, then the request is retried up to 3 times with exponential backoff before returning CBS_UNAVAILABLE to the caller"
+      - "Given 5 consecutive CBS failures, when the 6th API call arrives, then the circuit is open, the CBS is not contacted, and the response is HTTP 503 with error code CBS_UNAVAILABLE and retry_after_seconds"
+      - "Given the circuit is open and 60 seconds elapse, when the next API call arrives and the CBS probe succeeds, then the circuit closes and the response is normal"
+      - "Given a successful CBS call, when the endpoint is called, then the response is identical to current behavior (circuit breaker is transparent)"
+    tags: [banking, integration, circuit-breaker, resilience, cbs]
+    baseline_pass_rate: null

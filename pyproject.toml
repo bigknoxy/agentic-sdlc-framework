@@ -33,7 +33,7 @@ include = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=src/agentic_sdlc --cov-report=term-missing --cov-fail-under=85"
+addopts = "--cov=src/agentic_sdlc --cov=server --cov-report=term-missing --cov-fail-under=85"
 
 [project.optional-dependencies]
 dev = [
@@ -41,3 +41,4 @@ dev = [
     "pytest-cov>=5.0",
     "click[testing]>=8.1",
 ]
+mcp = ["mcp>=1.0"]
