@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Template library: agent-ready-spec, handoff-packet, weekly-scorecard, pilot-proposal, ADR
 - 3 pilot examples: regulated financial, personal project, enterprise
 - Comprehensive documentation: framework overview, security guardrails, implementation guide
+- **Golden task baseline data** (91.7% pass rate) with leadership package and ROI analysis
+- **Before/after case study** demonstrating 58% cycle time reduction and 200% quarterly ROI
+- CHANGELOG.md following Keep a Changelog format
+- docs/methodology.md symlink to framework overview
+- README venv installation instructions for Python 3.11+ compatibility
 
 ### Changed
 - N/A (initial release)
