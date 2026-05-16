@@ -11,58 +11,66 @@ from agentic_sdlc.utils.output import success, info, error, warn, step
 @click.argument("project_name")
 @click.pass_context
 def init(ctx: click.Context, project_name: str) -> None:
-    """Initialize a new Agentic SDLC project.
+    """Initialize a new or existing project with the Agentic SDLC structure.
 
-    Creates a project directory with the standard structure: specs/,
-    handoffs/, adrs/, and a .agentic-sdlc.yaml config file.
+    Creates specs/, handoffs/, adrs/, and .agentic-sdlc.yaml. Safe to run
+    on an existing directory — only missing pieces are added, nothing is
+    overwritten.
+
+    Pass "." to initialize the current directory in-place.
 
     \b
-    Example:
+    Examples:
         agentic-sdlc init my-api
+        agentic-sdlc init .
     """
-    project_dir = Path(project_name)
+    project_dir = Path(project_name).resolve()
+    in_place = project_dir == Path.cwd()
+    display_name = "." if in_place else project_name
+    created: list[str] = []
 
-    if project_dir.exists():
-        error(f"Directory already exists: {project_dir}")
-        ctx.exit(1)
-        return
-
-    # Create directory structure
+    # Create directory structure (additive — skip existing)
     subdirs = ["specs", "handoffs", "adrs"]
     try:
-        project_dir.mkdir(parents=True)
+        project_dir.mkdir(parents=True, exist_ok=True)
         for subdir in subdirs:
-            (project_dir / subdir).mkdir()
+            subdir_path = project_dir / subdir
+            if not subdir_path.exists():
+                subdir_path.mkdir()
+                gitkeep = subdir_path / ".gitkeep"
+                gitkeep.write_text("", encoding="utf-8")
+                created.append(f"  {display_name}/{subdir}/")
     except OSError as exc:
-        error(f"Failed to create project directory: {exc}")
+        error(f"Failed to create project directories: {exc}")
         ctx.exit(1)
         return
 
-    # Write config file
+    # Write config only if absent
     config_path = project_dir / ".agentic-sdlc.yaml"
-    config_content = DEFAULT_CONFIG_YAML.format(project_name=project_name)
-    try:
-        config_path.write_text(config_content, encoding="utf-8")
-    except OSError as exc:
-        error(f"Failed to write config file: {exc}")
-        ctx.exit(1)
-        return
+    if not config_path.exists():
+        config_name = project_dir.name if in_place else project_name
+        config_content = DEFAULT_CONFIG_YAML.format(project_name=config_name)
+        try:
+            config_path.write_text(config_content, encoding="utf-8")
+            created.append(f"  {display_name}/.agentic-sdlc.yaml")
+        except OSError as exc:
+            error(f"Failed to write config file: {exc}")
+            ctx.exit(1)
+            return
 
-    # Write a .gitkeep in each subdir so they show up in git
-    for subdir in subdirs:
-        gitkeep = project_dir / subdir / ".gitkeep"
-        gitkeep.write_text("", encoding="utf-8")
-
-    success(f"Initialized project: {project_name}/")
-    click.echo("")
-    info("Project structure created:")
-    for subdir in subdirs:
-        step(f"  {project_name}/{subdir}/")
-    step(f"  {project_name}/.agentic-sdlc.yaml")
+    if created:
+        success(f"Initialized project: {display_name}")
+        click.echo("")
+        info("Created:")
+        for item in created:
+            step(item)
+    else:
+        success(f"Project already initialized: {display_name} (nothing to add)")
 
     click.echo("")
     info("Next steps:")
-    click.echo(f"  1. cd {project_name}")
-    click.echo("  2. Edit .agentic-sdlc.yaml to configure your project")
-    click.echo("  3. Create your first spec:")
-    click.echo('       agentic-sdlc spec create --title "My First Feature"')
+    if not in_place:
+        click.echo(f"  1. cd {project_name}")
+    click.echo("  Edit .agentic-sdlc.yaml to configure your project")
+    click.echo("  Create your first spec:")
+    click.echo('    agentic-sdlc spec create --title "My First Feature"')

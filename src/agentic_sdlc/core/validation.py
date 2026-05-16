@@ -238,7 +238,7 @@ def validate_handoff_milestone_status(content: str) -> Tuple[bool, List[str]]:
     status_pattern = r"- \[([ x])\]\s*(✅|⚠️|❌)\s*Completed"
     if not re.search(status_pattern, content):
         errors.append(
-            "Milestone status not set (should have - [x] or - [ ] with emoji)"
+            "Milestone status not set — mark one status with [x], e.g.: - [x] ✅ Completed successfully"
         )
 
     return len(errors) == 0, errors
@@ -294,9 +294,9 @@ def validate_handoff_next_steps(content: str) -> Tuple[bool, List[str]]:
     if "### Immediate" not in content:
         errors.append("Immediate next steps not defined")
 
-    step_pattern = r"^\d+\.\s*\[.+\]"
+    step_pattern = r"^\d+\.\s+\S"
     if not re.search(step_pattern, content, re.MULTILINE):
-        errors.append("Next steps should be numbered action items")
+        errors.append("Next steps should be numbered action items (e.g. '1. Deploy to staging')")
 
     return len(errors) == 0, errors
 

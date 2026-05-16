@@ -17,6 +17,8 @@ workflow: [Name of workflow/project]
 [What this milestone was intended to accomplish - one sentence]
 
 ### Status
+Mark one with [x] — keep the emoji, it is required by the validator.
+
 - [ ] ✅ Completed successfully
 - [ ] ⚠️ Completed with issues
 - [ ] ❌ Blocked/Incomplete

@@ -33,11 +33,25 @@ class TestInitCommand:
             content = cfg_path.read_text()
             assert "my-project" in content
 
-    def test_init_fails_on_existing_directory(self, tmp_path):
+    def test_init_on_existing_directory_is_additive(self, tmp_path):
         with self.runner.isolated_filesystem(temp_dir=tmp_path):
             Path("existing").mkdir()
             result = self.runner.invoke(cli, ["init", "existing"])
-            assert result.exit_code != 0
+            assert result.exit_code == 0, result.output
+            # Creates missing subdirs without clobbering existing content
+            for subdir in ["specs", "handoffs", "adrs"]:
+                assert Path(f"existing/{subdir}").is_dir()
+            assert Path("existing/.agentic-sdlc.yaml").exists()
+
+    def test_init_skips_existing_config(self, tmp_path):
+        with self.runner.isolated_filesystem(temp_dir=tmp_path):
+            Path("existing").mkdir()
+            cfg = Path("existing/.agentic-sdlc.yaml")
+            cfg.write_text("custom: true\n")
+            result = self.runner.invoke(cli, ["init", "existing"])
+            assert result.exit_code == 0, result.output
+            # Existing config must not be overwritten
+            assert cfg.read_text() == "custom: true\n"
 
     def test_init_prints_next_steps(self, tmp_path):
         with self.runner.isolated_filesystem(temp_dir=tmp_path):
