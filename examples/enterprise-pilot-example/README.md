@@ -100,7 +100,7 @@ Automate the monthly compliance report generation process.
 
 ## Phase 1: Executable Spec
 
-See [spec-compliance-reporting.md](spec-compliance-reporting.md) for the complete agent-ready specification.
+See [spec-internal-reporting.md](spec-internal-reporting.md) for the complete agent-ready specification.
 
 ### Key Decisions from Spec
 
@@ -141,8 +141,6 @@ See [spec-compliance-reporting.md](spec-compliance-reporting.md) for the complet
 - Direct SQL in Excel: Rejected (security, maintainability)
 - Custom scheduler: Rejected (use existing infrastructure)
 
-See [adr-001-report-architecture.md](adr-001-report-architecture.md)
-
 ### ADR-002: Data Access Pattern
 
 **Decision:** Read-only SQL views with service account
@@ -157,8 +155,6 @@ See [adr-001-report-architecture.md](adr-001-report-architecture.md)
 - Service account credentials in HashiCorp Vault
 - Connection encrypted (TLS 1.3)
 - Query logging enabled
-
-See [adr-002-data-access.md](adr-002-data-access.md)
 
 ### Data Flow Diagram
 
@@ -199,8 +195,6 @@ User Request → Airflow → Service Account → SQL Views
 
 ### Milestone 1: Data Access Layer
 
-**Handoff Packet:** [handoff-packets/handoff-001.md](handoff-packets/handoff-001.md)
-
 **What was built:**
 - Database connection manager
 - SQL view abstractions
@@ -222,8 +216,6 @@ User Request → Airflow → Service Account → SQL Views
 
 ### Milestone 2: Business Logic & Transformations
 
-**Handoff Packet:** [handoff-packets/handoff-002.md](handoff-packets/handoff-002.md)
-
 **What was built:**
 - Data transformation functions
 - Business rule validation
@@ -243,8 +235,6 @@ User Request → Airflow → Service Account → SQL Views
 - Data quality checks catch 100% of known bad data patterns
 
 ### Milestone 3: Report Generation & Distribution
-
-**Handoff Packet:** [handoff-packets/handoff-003.md](handoff-packets/handoff-003.md)
 
 **What was built:**
 - Excel report generation
@@ -459,33 +449,9 @@ Specs that needed rework:
 ```
 enterprise-pilot-example/
 ├── README.md                          # This file
-├── spec-compliance-reporting.md       # Agent-ready spec
-├── adr-001-report-architecture.md   # Architecture decision
-├── adr-002-data-access.md           # Security decision
-├── compliance-checklist.md          # Compliance requirements
-├── handoff-packets/
-│   ├── handoff-001.md              # Milestone 1
-│   ├── handoff-002.md              # Milestone 2
-│   └── handoff-003.md              # Milestone 3
-├── src/
-│   ├── __init__.py
-│   ├── extract.py                   # Data extraction
-│   ├── transform.py                 # Business logic
-│   ├── load.py                      # Report generation
-│   ├── audit.py                     # Audit logging
-│   ├── config.py                    # Configuration
-│   └── exceptions.py                # Custom exceptions
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── fixtures/
-├── dags/
-│   └── compliance_report.py         # Airflow DAG
-├── templates/
-│   └── report_template.xlsx         # Excel template
-├── requirements.txt
-├── Dockerfile
-└── docker-compose.yml
+├── spec-internal-reporting.md         # Agent-ready spec
+├── compliance-checklist.md            # Compliance requirements
+└── pilot-proposal.md                  # Pilot proposal
 ```
 
 ---

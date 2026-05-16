@@ -52,10 +52,21 @@ We practice what we preach — this framework is developed using the Agentic SDL
 
 ## Development Setup
 
+This project is Python-based (Python 3.11+). There is no Node.js or npm dependency.
+
 ```bash
 # Clone your fork
 git clone https://github.com/your-username/agentic-sdlc-framework.git
 cd agentic-sdlc-framework
+
+# Install Python dependencies (Python 3.11+ required)
+pip install -e ".[dev]"
+
+# Verify CLI works
+agentic-sdlc --help
+
+# Run tests
+pytest
 
 # Create a branch
 git checkout -b feature/your-feature

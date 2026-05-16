@@ -4,6 +4,15 @@
 
 The Agentic SDLC Framework can be delivered through multiple interfaces. This document analyzes the options and recommends a phased approach starting with CLI, then expanding to IDE and MCP.
 
+## Current Status
+
+| Phase | Deliverable | Status |
+|-------|------------|--------|
+| Phase 1 — CLI | `agentic-sdlc` CLI (init, spec, handoff, check, metrics) | Complete |
+| Phase 2 — MCP | MCP server (`tools/mcp-server/server.py`) | Complete |
+| Phase 3 — IDE | VS Code / JetBrains extension | Planned |
+| Phase 4 — Web | Web dashboard | Planned |
+
 ## Option Analysis
 
 ### Option 1: CLI Tool (Recommended Start)
@@ -21,8 +30,8 @@ agentic-sdlc spec create --template api --title "User Service"
 # Validate spec
 agentic-sdlc spec validate
 
-# Start implementation phase
-agentic-sdlc implement --milestone 1
+# Note: implemented commands are init, spec, handoff, check, metrics
+# agentic-sdlc implement --milestone 1  # aspirational — not yet implemented
 
 # Generate handoff packet
 agentic-sdlc handoff create
@@ -36,8 +45,8 @@ agentic-sdlc check --all
 # Generate weekly scorecard
 agentic-sdlc metrics --week
 
-# Deploy with canary
-agentic-sdlc deploy --strategy canary
+# Note: implemented commands are init, spec, handoff, check, metrics
+# agentic-sdlc deploy --strategy canary  # aspirational — not yet implemented
 ```
 
 **Pros:**
@@ -220,13 +229,13 @@ Web UI:
 
 ## Recommended Phased Approach
 
-### Phase 1: CLI Foundation (Now - Month 1)
+### Phase 1: CLI Foundation — Complete
 
 **Goal:** Get framework into hands of early adopters
 
-**Deliverables:**
+**Deliverables (implemented):**
 1. `agentic-sdlc` CLI tool
-2. Core commands: init, spec, validate, handoff, check, deploy
+2. Core commands: init, spec (create/validate/list), handoff (create/validate/list), check, metrics
 3. Configuration file support (.agentic-sdlc.yaml)
 4. Integration with existing templates
 
@@ -271,11 +280,11 @@ def validate():
 
 ---
 
-### Phase 2: MCP Server (Month 2-3)
+### Phase 2: MCP Server — Complete
 
 **Goal:** Enable fully agentic workflows
 
-**Deliverables:**
+**Deliverables (implemented — see `tools/mcp-server/server.py`):**
 1. MCP server exposing framework tools
 2. Integration with Claude Desktop
 3. Self-managing agent workflows
@@ -458,7 +467,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: agentic-sdlc/action@v1
+      - uses: agentic-sdlc/action@v1  # GitHub Action not yet published
         with:
           command: check --all
           fail-on-error: true

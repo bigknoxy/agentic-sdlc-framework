@@ -500,19 +500,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Validate audit trail completeness
+      - name: Validate audit trail and data classification compliance
         run: |
-          python tools/guardrail-scripts/check-audit-trail.py \
-            --since ${{ inputs.artifact_sha }} \
-            --required-events "spec.approved,code.reviewed,security.approved" \
-            --output-format json
-          # Fails if any required audit event is missing for this release
-
-      - name: Validate data classification compliance
-        run: |
-          python tools/guardrail-scripts/check-data-classification.py \
-            --path src/ \
-            --policy-file .security/data-classification-policy.yml
+          # Compliance checks run via CLI
+          agentic-sdlc check --all
+          # Fails if any required audit event is missing or data classification is violated
 
       - name: Check for restricted data in agent context
         run: |
@@ -1027,7 +1019,7 @@ This section documents controls required specifically for regional financial ins
 
 ### Regulatory Framework
 
-The The organization operates under oversight from the Federal Housing Finance Agency (FHFA) and is subject to:
+The organization operates under oversight from the Federal Housing Finance Agency (FHFA) and is subject to:
 
 - **FHFA Advisory Bulletin AB 2023-06**: Third-party risk management
 - **FFIEC Cybersecurity Assessment Tool (CAT)**: Cybersecurity maturity requirements

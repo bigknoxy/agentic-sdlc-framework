@@ -54,8 +54,8 @@ nano my-project/intake.md
 # Validate intake completeness
 python tools/guardrail-scripts/validate-intake.py my-project/intake.md
 
-# Check for common issues
-python tools/guardrail-scripts/check-compliance.py my-project/intake.md
+# Check for common issues (runs via CLI)
+# agentic-sdlc check --all
 ```
 
 **What it checks:**
@@ -211,8 +211,8 @@ nano my-project/adr-001.md
 **Automated:** Security validation
 
 ```bash
-# Check for security considerations
-python tools/guardrail-scripts/check-security.py my-project/
+# Check for security considerations (runs via CLI)
+# agentic-sdlc check --all
 ```
 
 #### Step 4: Human Review
@@ -376,11 +376,8 @@ trivy image myapp:latest
 **Automated:**
 
 ```bash
-# Check audit trail completeness
-python tools/guardrail-scripts/check-audit-trail.py my-project/
-
-# Validate data handling
-python tools/guardrail-scripts/check-data-classification.py my-project/
+# Check audit trail completeness and validate data handling (runs via CLI)
+agentic-sdlc check --all
 ```
 
 #### Step 3: Human Approval Gates
@@ -481,7 +478,7 @@ If error_rate > threshold:
 
 ```bash
 # Generate weekly scorecard
-python tools/guardrail-scripts/generate-scorecard.py --week 2025-01-15
+python tools/golden-task-set/evaluate.py --week 2025-01-15
 ```
 
 **Manual:** Review and action
@@ -566,7 +563,7 @@ python tools/guardrail-scripts/validate-spec.py specs/FEATURE-001.md
 
 | Process | Tool | When It Runs |
 |---------|------|--------------|
-| Linting | ruff, black, eslint | Every commit |
+| Linting | ruff, black | Every commit |
 | Type checking | mypy | Every commit |
 | Unit tests | pytest | Every commit |
 | Security scanning | bandit, semgrep | Every commit + nightly |
@@ -642,7 +639,7 @@ make deploy
 
 ```bash
 # Generate weekly scorecard
-python tools/guardrail-scripts/generate-scorecard.py --week 2025-01-15
+python tools/golden-task-set/evaluate.py --week 2025-01-15
 
 # View metrics dashboard
 open https://datadog.mycompany.com/dashboard
@@ -653,7 +650,7 @@ open https://datadog.mycompany.com/dashboard
 ## Getting Started Checklist
 
 - [ ] Clone framework repository
-- [ ] Install dependencies (`pip install -r requirements.txt`)
+- [ ] Install dependencies (`pip install -e ".[dev]"`)
 - [ ] Set up CI/CD (GitHub Actions configured)
 - [ ] Choose first project (personal or pilot)
 - [ ] Copy spec template

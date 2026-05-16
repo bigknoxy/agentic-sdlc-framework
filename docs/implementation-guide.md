@@ -22,8 +22,9 @@ This track assumes a single developer, a GitHub repository, and no compliance re
 git clone https://github.com/bigknoxy/agentic-sdlc-framework.git
 cd agentic-sdlc-framework
 
-# Install Python dependencies
-pip install -r requirements.txt
+# Install Python dependencies and CLI from repo root
+pip install -e ".[dev]"
+# This installs the `agentic-sdlc` CLI (commands: init, spec, handoff, check, metrics)
 
 # Initialize your project directory
 mkdir -p my-project/{specs,handoffs,adrs,docs}
@@ -182,7 +183,7 @@ Run the set against an agent every Friday and record results in the weekly score
 Generate your first scorecard to establish a baseline:
 
 ```bash
-python tools/guardrail-scripts/generate-scorecard.py --week $(date +%Y-%m-%d)
+python tools/golden-task-set/evaluate.py --week $(date +%Y-%m-%d)
 ```
 
 Record baseline values manually for the four FRAME metrics:
@@ -323,7 +324,7 @@ The framework CI workflow covers linting, spec validation, secret detection, and
       - name: Python dependency audit
         run: |
           pip install safety pip-audit
-          pip-audit --requirement requirements.txt --format json
+          pip-audit --format json
 
       - name: License compliance check
         run: |
@@ -355,7 +356,7 @@ The first spec should be modest — something 1-2 days of work, not a multi-week
 
 ```bash
 python tools/guardrail-scripts/validate-spec.py specs/SPEC-2025-W2-001.md
-python tools/guardrail-scripts/check-compliance.py specs/SPEC-2025-W2-001.md
+# agentic-sdlc check --all  # runs compliance checks via CLI
 ```
 
 ### Week 3: First Pilot Implementation
@@ -403,7 +404,7 @@ Do not skip the reviewer agent step. The reviewer is a separate agent pass that 
 **Collect metrics:**
 
 ```bash
-python tools/guardrail-scripts/generate-scorecard.py --week $(date +%Y-%m-%d)
+python tools/golden-task-set/evaluate.py --week $(date +%Y-%m-%d)
 ```
 
 Fill in the four FRAME metrics manually where automation does not yet reach:
@@ -590,7 +591,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pip-audit
-      - run: pip-audit --requirement requirements.txt
+      - run: pip-audit
 ```
 
 **All CI jobs must be required status checks in branch protection.** If a job is optional, it will be ignored.
@@ -619,17 +620,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Validate audit trail completeness
+      - name: Validate audit trail completeness and data classification
         run: |
-          python tools/guardrail-scripts/check-audit-trail.py \
-            --since $(git log --format="%H" -1 HEAD~1) \
-            --output-format json
-
-      - name: Validate data classification handling
-        run: |
-          python tools/guardrail-scripts/check-data-classification.py \
-            --path src/ \
-            --min-level internal
+          # Compliance checks run via CLI
+          agentic-sdlc check --all
 
       - name: Model vulnerability scan
         run: |
@@ -874,7 +868,7 @@ Friday, 30 minutes:
 
 ```bash
 # Generate the scorecard
-python tools/guardrail-scripts/generate-scorecard.py --week $(date +%Y-%m-%d)
+python tools/golden-task-set/evaluate.py --week $(date +%Y-%m-%d)
 
 # Store it
 cp scorecard-output.md docs/metrics/scorecard-$(date +%Y-%m-%d).md
@@ -903,55 +897,6 @@ Every 12 weeks, spend 2-3 hours reviewing the framework itself:
 
 # Document decisions in an ADR
 cp templates/architecture-decision-record.md docs/adr/adr-$(date +%Y%m%d)-framework-review.md
-```
-
----
-
-## Makefile Quick Reference
-
-The framework ships with a `Makefile` for common operations. If yours does not have one, create it:
-
-```makefile
-.PHONY: check test security validate-specs scorecard
-
-check:
-	pre-commit run --all-files
-
-test:
-	pytest tests/ --cov=src --cov-fail-under=80
-
-security:
-	bandit -r src/ -ll
-	semgrep --config=auto src/
-	trufflehog filesystem --no-update .
-	pip-audit --requirement requirements.txt
-
-validate-specs:
-	@for spec in specs/*.md; do \
-		echo "Validating $$spec..."; \
-		python tools/guardrail-scripts/validate-spec.py $$spec; \
-	done
-
-scorecard:
-	python tools/guardrail-scripts/generate-scorecard.py --week $(shell date +%Y-%m-%d)
-
-audit-entry:
-	python tools/guardrail-scripts/generate-audit-trail.py \
-		--action "$(ACTION)" \
-		--actor "$(ACTOR)" \
-		--resource "$(RESOURCE)" \
-		--log-file audit/audit.jsonl
-```
-
-Usage:
-
-```bash
-make check           # Run all pre-commit hooks
-make test            # Run test suite
-make security        # Run security scans
-make validate-specs  # Validate all specs in specs/ directory
-make scorecard       # Generate this week's scorecard
-ACTION="spec.approved" ACTOR="josh" RESOURCE="SPEC-001" make audit-entry
 ```
 
 ---

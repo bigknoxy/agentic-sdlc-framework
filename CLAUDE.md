@@ -8,6 +8,33 @@ A documentation-and-tooling framework (not a runnable application) for integrati
 
 ## Commands
 
+### CLI
+
+```bash
+# Install (dev mode)
+pip install -e ".[dev]"
+
+# Init project
+agentic-sdlc init <project-name>
+
+# Spec commands
+agentic-sdlc spec create --title "Feature Name"
+agentic-sdlc spec validate specs/SPEC-2026-01-15-001.md
+agentic-sdlc spec list
+
+# Handoff commands
+agentic-sdlc handoff create --milestone 1 --agent claude-code
+agentic-sdlc handoff validate handoffs/HANDOFF-001.md
+
+# Guardrail check (CI-friendly, exits 1 on failure)
+agentic-sdlc check --all
+
+# Golden task evaluation
+python tools/golden-task-set/evaluate.py --list
+python tools/golden-task-set/evaluate.py --task GT-001
+python tools/golden-task-set/evaluate.py --week
+```
+
 ### Guardrail Scripts (Python 3.11+)
 
 ```bash
@@ -61,6 +88,8 @@ python3 -m py_compile tools/guardrail-scripts/<script>.py
 | `templates/` | Fill-in-the-blank source artifacts agents and humans complete |
 | `docs/` | Framework methodology and usage guidance |
 | `tools/guardrail-scripts/` | Python validators that enforce spec/packet completeness |
+| `tools/mcp-server/` | MCP server exposing 5 framework tools for Claude Desktop / MCP clients |
+| `tools/golden-task-set/` | 12 standardized evaluation tasks + evaluate.py for weekly metrics |
 | `examples/` | Worked examples (personal and enterprise) showing completed artifacts |
 | `.github/workflows/` | CI: markdown lint, spec validation, secret scanning, structure checks |
 
@@ -102,8 +131,6 @@ Each script in `tools/guardrail-scripts/` follows the same pattern:
 **Spec frontmatter** must include: `spec_id`, `title`, `status`, `priority`. **Handoff packet frontmatter** must include: `packet_id`, `milestone`, `date`, `agent`, `supervisor`.
 
 **Spec ID format:** `SPEC-YYYY-MM-DD-NNN` (e.g. `SPEC-2025-01-15-001`). Increment NNN per day.
-
-> **Note:** `validate-intake.py` is referenced in `docs/how-to-use.md` but not yet implemented. Do not attempt to run it.
 
 ## Contributing
 

@@ -113,8 +113,6 @@ What could improve:
 - Learning curve for advanced features
 - Worth it for this project
 
-See [adr-001-framework-choice.md](adr-001-framework-choice.md)
-
 ### Architecture Diagram
 
 ```
@@ -147,8 +145,6 @@ See [adr-001-framework-choice.md](adr-001-framework-choice.md)
 
 ### Milestone 1: Project Setup & Models
 
-**Handoff Packet:** [handoff-packets/handoff-001.md](handoff-packets/handoff-001.md)
-
 **What was built:**
 - Project structure
 - Database models (SQLAlchemy)
@@ -165,8 +161,6 @@ See [adr-001-framework-choice.md](adr-001-framework-choice.md)
 
 ### Milestone 2: CRUD Endpoints
 
-**Handoff Packet:** [handoff-packets/handoff-002.md](handoff-packets/handoff-002.md)
-
 **What was built:**
 - POST /tasks (create)
 - GET /tasks (list with filters)
@@ -181,8 +175,6 @@ See [adr-001-framework-choice.md](adr-001-framework-choice.md)
 - Fixed in 10 minutes
 
 ### Milestone 3: Authentication & Testing
-
-**Handoff Packet:** [handoff-packets/handoff-003.md](handoff-packets/handoff-003.md)
 
 **What was built:**
 - JWT authentication
@@ -300,26 +292,7 @@ Specs that needed rework:
 ```
 personal-project-example/
 ├── README.md                    # This file
-├── spec-task-api.md             # Agent-ready spec
-├── adr-001-framework-choice.md   # Architecture decision
-├── handoff-packets/
-│   ├── handoff-001.md          # Milestone 1
-│   ├── handoff-002.md          # Milestone 2
-│   └── handoff-003.md          # Milestone 3
-├── src/
-│   ├── main.py                 # FastAPI app
-│   ├── models.py               # SQLAlchemy models
-│   ├── schemas.py              # Pydantic schemas
-│   ├── crud.py                 # Database operations
-│   ├── auth.py                 # JWT authentication
-│   └── database.py             # DB connection
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-├── requirements.txt
-├── Dockerfile
-└── docker-compose.yml
+└── spec-task-api.md             # Agent-ready spec
 ```
 
 ---
