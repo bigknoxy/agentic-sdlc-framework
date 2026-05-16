@@ -1,7 +1,5 @@
 # Implementation Plan: Agentic SDLC Framework
 
-> **For Hermes:** Use subagent-driven-development skill to implement this plan task-by-task.
-
 **Goal:** Create a complete, production-ready Agentic SDLC Framework with documentation, templates, tooling, and examples that can be used for both personal projects and enterprise (Apex Financial Corp) adoption.
 
 **Architecture:** Documentation-driven framework with executable templates, CI/CD configurations, and multi-agent orchestration patterns. Each phase builds on previous work with clear handoffs.

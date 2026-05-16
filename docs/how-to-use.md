@@ -398,16 +398,6 @@ agentic-sdlc check --all
 
 #### Step 1: Deployment Preparation
 
-**Semi-automated:**
-
-```bash
-# Build and package
-make build
-
-# Run pre-deployment checks
-make pre-deploy-checks
-```
-
 #### Step 2: Canary Deployment
 
 **Fully automated:**
@@ -623,16 +613,13 @@ python tools/guardrail-scripts/generate-audit-trail.py \
 
 ```bash
 # Run all checks locally
-make check
+agentic-sdlc check --all
 
 # Run tests
-make test
+pytest
 
-# Run security scan
-make security
-
-# Build and deploy
-make deploy
+# Run security scan only
+agentic-sdlc check --secrets
 ```
 
 ### Metrics
@@ -640,9 +627,6 @@ make deploy
 ```bash
 # Generate weekly scorecard
 python tools/golden-task-set/evaluate.py --week 2025-01-15
-
-# View metrics dashboard
-open https://datadog.mycompany.com/dashboard
 ```
 
 ---
