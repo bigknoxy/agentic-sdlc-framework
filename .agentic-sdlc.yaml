@@ -1,0 +1,25 @@
+project:
+  name: "agentic-sdlc-framework"
+  type: "framework"
+
+framework:
+  version: "0.1.0"
+  strict_mode: false
+
+templates:
+  specs_dir: "specs"
+  handoffs_dir: "handoffs"
+  adrs_dir: "adrs"
+
+guardrails:
+  min_coverage: 85
+  security_scan: true
+
+agents:
+  planner: "claude-code"
+  executor: "claude-code"
+  reviewer: "claude-code"
+
+compliance:
+  data_classification: "public"
+  requires_audit: true

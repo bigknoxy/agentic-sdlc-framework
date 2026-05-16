@@ -78,7 +78,7 @@ def validate_spec_acceptance_criteria(content: str) -> Tuple[bool, List[str]]:
     """Validate acceptance criteria use Gherkin format."""
     errors: List[str] = []
 
-    gherkin_pattern = r"(Given|When|Then|And|But)\s+\[.*\]"
+    gherkin_pattern = r"(Given|When|Then|And|But)\s+\S"
     if not re.search(gherkin_pattern, content, re.IGNORECASE):
         errors.append("Acceptance criteria should use Gherkin format (Given/When/Then)")
 

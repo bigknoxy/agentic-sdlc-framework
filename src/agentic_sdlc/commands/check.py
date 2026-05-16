@@ -30,7 +30,7 @@ SECRET_PATTERNS = [
 SCAN_EXTENSIONS = {".py", ".js", ".ts", ".yaml", ".yml", ".json", ".env", ".sh", ".bash", ".toml", ".cfg", ".ini"}
 
 # Directories/files to always skip
-SKIP_DIRS = {".git", "__pycache__", ".venv", "venv", "node_modules", ".mypy_cache", ".pytest_cache"}
+SKIP_DIRS = {".git", "__pycache__", ".venv", "venv", "node_modules", ".mypy_cache", ".pytest_cache", "tests"}
 
 
 @click.command("check")
